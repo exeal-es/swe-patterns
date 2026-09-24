@@ -23,13 +23,18 @@ Cuando tengas suficiente información:
 
 - Propón un slug/nombre claro si no está definido.
 - Usa el front matter exacto: `title`, `description`, `date` (hoy), `tags`, `maturity`.
-- Sigue la estructura: Problema, Contexto, Solución (obligatorias) y opcionalmente Implementación, Ejemplos, Alternativas, Recursos — incluye solo las secciones opcionales que aporten contenido real, no las rellenes por completitud.
+- Sigue la estructura del archetype (`archetypes/patterns.md`): Problema, Solución (obligatorias) y opcionalmente Variantes, Ejemplos, Recursos.
+  - **Problema** fusiona problema y contexto: qué duele y en qué condiciones aparece, en una sola sección.
+  - **Solución** prescribe una única receta: la idea central más una guía de implementación completa y accionable (pasos, decisiones, código/config representativos) para aplicar el patrón en un proyecto concreto. No presentes varias opciones aquí.
+  - **Variantes** (opcional) recoge alternativas a la receta y cuándo elegirlas en su lugar. Inclúyela solo si hay alternativas reales que documentar.
+  - **Ejemplos** es la única sección donde se pueden nombrar proyectos o repos concretos. En el resto del artículo no menciones proyectos específicos.
+  - Incluye solo las secciones opcionales que aporten contenido real, no las rellenes por completitud.
 - Escribe en español, con el tono de Pedro: conversacional, técnico, directo, concreto. Nada de tono corporativo ni "thought leadership".
 - Sé conciso: si algo se explica en 500 palabras, no escribas 1.500.
 - No inventes nada: ni experiencias, ni resultados, ni trade-offs, ni ejemplos que Pedro no haya dado o que no estén en el código.
 - Si hay código o configuración relevante en el repo, úsalo (o una simplificación fiel) en vez de inventar un ejemplo genérico.
 
-Antes de guardar, comprueba que el artículo describe **problema recurrente → contexto → solución reutilizable**, no una anécdota, un tutorial de herramienta, o una descripción de producto.
+Antes de guardar, comprueba que el artículo describe **problema recurrente (con su contexto) → solución con receta única y aplicable → variantes/ejemplos opcionales**, no una anécdota, un tutorial de herramienta, o una descripción de producto.
 
 Guarda el archivo en `content/patterns/<slug>.md` y dile a Pedro dónde quedó y qué `maturity` le pusiste.
 
