@@ -31,3 +31,11 @@ Cuando tengas suficiente información:
 Antes de guardar, comprueba que el artículo describe **problema recurrente → contexto → solución reutilizable**, no una anécdota, un tutorial de herramienta, o una descripción de producto.
 
 Guarda el archivo en `content/patterns/<slug>.md` y dile a Pedro dónde quedó y qué `maturity` le pusiste.
+
+## Confidencialidad de repositorios
+
+NUNCA menciones ni enlaces un repositorio de un proyecto privado, aunque lo hayas investigado para extraer evidencia del patrón.
+
+Repos públicos permitidos (se pueden nombrar y enlazar): **Ne2Studio, CashClarity, Exeal, El Baúl**.
+
+Cualquier otro repo (aunque Pedro te dé acceso a él para investigar) se trata como propietario: usa su evidencia (código, decisiones, historia) sin identificarlo, igual que ya se hace en los artículos existentes con la fórmula "un repo propietario, sin enlace".
