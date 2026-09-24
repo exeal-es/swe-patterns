@@ -1,4 +1,5 @@
 ---
+name: documentar-patron
 description: Ayuda a documentar un nuevo patrón de ingeniería de software en la biblioteca de patrones de Exeal a partir de una explicación informal. Úsala cuando Pedro cuente una práctica que usa, pida documentar un patrón, o diga algo como "quiero documentar un patrón nuevo".
 ---
 
