@@ -15,9 +15,7 @@ Un frontend (o una suite de Playwright) que depende del backend real para poder 
 
 La tentación fácil es mockear a nivel de HTTP (interceptar `fetch` en el frontend, o levantar un backend "de mentira" con rutas ad-hoc) pero eso hace que frontend y tests dejen de ejercitar el contrato real: si la API cambia una forma de respuesta, el mock no se entera y el test sigue en verde mintiendo.
 
-## Contexto
-
-Aparece en aplicaciones .NET con arquitectura hexagonal (puertos y adaptadores) y separación en módulos: hay una capa `Core`/`Application` con los casos de uso y los puertos (`IPhotoRepository`, `IEmailSender`, etc.), y una capa `Infra` con los adaptadores reales (Postgres, S3, Hangfire, un proveedor de IA). Como los casos de uso ya dependen de interfaces y no de las implementaciones concretas, sustituir toda la infraestructura por otra cosa no exige tocar el dominio ni la capa HTTP — solo cambiar qué se registra en el contenedor de DI.
+El problema aparece en aplicaciones .NET con arquitectura hexagonal (puertos y adaptadores) y separación en módulos: hay una capa `Core`/`Application` con los casos de uso y los puertos (`IPhotoRepository`, `IEmailSender`, etc.), y una capa `Infra` con los adaptadores reales (Postgres, S3, Hangfire, un proveedor de IA). Como los casos de uso ya dependen de interfaces y no de las implementaciones concretas, sustituir toda la infraestructura por otra cosa no exige tocar el dominio ni la capa HTTP — solo cambiar qué se registra en el contenedor de DI.
 
 Se vuelve necesario en cuanto alguno de estos dos casos aparece: un equipo de frontend necesita iterar contra la API sin gestionar Postgres/Docker en su máquina, o una suite de Playwright necesita arrancar rápido, sin estado compartido entre specs, y sin que un servicio externo real (OIDC, IA, colas) introduzca no-determinismo.
 
@@ -25,24 +23,12 @@ Se vuelve necesario en cuanto alguno de estos dos casos aparece: un equipo de fr
 
 Construir un segundo host ejecutable de la misma API, que comparte con el host real todo lo que no depende de infraestructura (rutas, controladores, auth, middlewares, casos de uso) y sustituye únicamente los adaptadores de infraestructura por implementaciones en memoria, con el mismo ciclo de vida de proceso: un diccionario o una lista en memoria en vez de una tabla, un `Singleton` en el contenedor de DI en vez de una conexión a base de datos.
 
-La inversión de dependencias es lo que hace esto posible sin duplicar lógica: los casos de uso solo conocen los puertos (interfaces), así que el host Lite simplemente registra otra implementación de esas interfaces. La modularidad (separar "el host HTTP" de "la infraestructura" en proyectos/paquetes distintos) es lo que permite que ese segundo host sea, literalmente, otro proyecto pequeño que referencia los mismos módulos de dominio y de HTTP, pero un módulo de infraestructura distinto.
+La receta recomendada es la separación en proyectos propios, que evita que host real y host Lite diverjan silenciosamente:
 
-El resultado son dos imágenes/ejecutables de la misma API:
-
-- **El host real**: infraestructura real (Postgres, colas, servicios externos).
-- **El host Lite**: mismos endpoints, misma autenticación, mismo pipeline HTTP compilado — pero cada puerto de salida resuelve a una implementación en memoria, con estado que vive mientras vive el proceso y desaparece al reiniciarlo.
-
-Esto da a frontend y a Playwright un backend real (mismo contrato HTTP, misma autenticación real) pero sin ninguna dependencia externa, arranque instantáneo, y estado predecible y descartable entre ejecuciones.
-
-## Implementación
-
-El patrón aparece con tres niveles de madurez distintos, visibles en los tres repos donde está adoptado:
-
-1. **Un solo proyecto, todo junto (CashClarity).** El host Lite es un único proyecto ASP.NET con su propio `Program.cs`: registra listas en memoria (`List<JournalEntryResponse>` como `Singleton`) detrás de los mismos puertos (`IAccountsRepository`, `IJournalEntriesRepository`) y sustituye la autenticación real por un `FakeBearerAuthenticationHandler`. No comparte código de pipeline con un host real explícito — es el punto de partida más simple, sin capa `Common` separada.
-
-2. **Extensiones de DI compartidas (un segundo repo, propietario, sin enlace).** El host Lite reutiliza el pipeline real llamando a las mismas extensiones de registro (`AddXxxApi`, `UseXxxApi`, `AddXxxApiSwaggerGen`) que monta el host real — controladores, auth JWT/OIDC real (contra un `fake-oidc` real, no un mock de autenticación), CORS y Swagger son literalmente el mismo código. Lo único que cambia son los puertos de infraestructura, registrados como `Singleton` en memoria (colas, repositorios de dominio, límites de crédito...). Además añade un endpoint exclusivo del host Lite, `POST /lite/testing/seed`, deliberadamente sin autenticar, que Playwright llama directamente (no a través del navegador) para dejar cada spec en un estado inicial conocido antes de interactuar con la UI.
-
-3. **Separación en proyecto propio (El Baúl), el punto más maduro.** El pipeline HTTP compartido se extrae a su propio proyecto, `ElBaul.Api.Common`, con un único método `ElBaulApiHost.Build(builder)` que registra controladores, auth JWT, CORS, rate limiting y el cableado de casos de uso — usado tanto por el host real como por `ElBaul.Api.Lite`. La infraestructura en memoria vive en otro proyecto propio, `ElBaul.Infra.Lite`, con un método `AddLiteInfrastructure` que registra una implementación en memoria por cada puerto de salida (`InMemoryPhotoRepository`, `FakeEmailSender`, `FakeAiChatBackend`, `FakeBackgroundJobScheduler`...), cada uno `Singleton` porque ahí "es" el almacenamiento — no hay base de datos detrás que sobreviva entre requests. El propio `Program.cs` del host Lite es mínimo:
+1. **Extrae el pipeline HTTP compartido a su propio proyecto** (`Api.Common`), con un único método de arranque (p. ej. `ElBaulApiHost.Build(builder)`) que registra controladores, auth JWT, CORS, rate limiting y el cableado de casos de uso. Este proyecto lo usan tanto el host real como el host Lite — es literalmente el mismo código compilado en los dos. Que el reparto sea limpio aquí es la clave: si algo específico de infraestructura se cuela en este proyecto, el host Lite deja de ser un espejo fiel del real.
+2. **Crea un proyecto de infraestructura en memoria** (`Infra.Lite`), con un método de registro (p. ej. `AddLiteInfrastructure`) que da de alta una implementación en memoria por cada puerto de salida (`InMemoryPhotoRepository`, `FakeEmailSender`, `FakeAiChatBackend`, `FakeBackgroundJobScheduler`...). Cada una se registra como `Singleton`, porque ahí "es" el almacenamiento — no hay base de datos detrás que sobreviva entre requests.
+3. **No sustituyas la autenticación por un mock trivial que salte todo el flujo.** El host Lite sigue validando JWT reales contra un proveedor OIDC real (`fake-oidc`), solo que ese proveedor también corre en memoria o en un contenedor ligero. Eso es lo que permite que Playwright ejercite el login real y no un atajo que nunca se prueba en producción.
+4. **Deja el `Program.cs` del host Lite mínimo**, montando solo la infraestructura en memoria sobre el pipeline compartido:
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
@@ -57,16 +43,27 @@ var app = ElBaulApiHost.Build(builder);
 app.Run();
 ```
 
-Un detalle que se repite en los tres repos: lo que se sustituye siempre son los puertos de infraestructura (repositorios, envío de email, IA, storage), nunca la autenticación por un mock trivial que salte todo el flujo — el segundo repo y El Baúl siguen validando JWT reales contra un proveedor OIDC real (`fake-oidc`), solo que ese proveedor también corre en memoria/contenedor ligero. Eso es lo que permite que Playwright ejercite el login real y no un atajo que nunca se prueba en producción.
+5. **Añade, si Playwright lo necesita, un endpoint exclusivo del host Lite para sembrar estado** (p. ej. `POST /lite/testing/seed`), deliberadamente sin autenticar, que Playwright llama directamente (no a través del navegador) para dejar cada spec en un estado inicial conocido. Que no lleve autenticación es un riesgo aceptable porque el host Lite nunca corre con datos reales ni se despliega donde importe.
 
-## Trade-offs reales observados
+El resultado son dos imágenes/ejecutables de la misma API: el host real con infraestructura real (Postgres, colas, servicios externos), y el host Lite con los mismos endpoints, la misma autenticación, el mismo pipeline HTTP compilado, pero con cada puerto de salida resuelto a una implementación en memoria cuyo estado vive mientras vive el proceso y desaparece al reiniciarlo.
 
-- **Compartir el pipeline HTTP (`Api.Common`) evita que host real y host Lite diverjan silenciosamente**, pero exige diseñar ese proyecto desde el principio como "todo lo que no depende de infraestructura" — si el reparto no es limpio, algo específico de infraestructura se cuela ahí y el host Lite deja de ser un espejo fiel.
-- **Un endpoint de seed sin autenticar (`/lite/testing/seed`) es deliberadamente inseguro**, pero es aceptable porque el host Lite nunca corre con datos reales ni se despliega donde importe.
-- **El nivel más simple (CashClarity, un solo proyecto) es más rápido de montar** pero no protege contra que el host real y el Lite diverjan en el pipeline HTTP, porque no hay una pieza compartida explícita que lo impida.
+Se sabe que el patrón está bien aplicado cuando frontend y Playwright hablan contra un backend con contrato HTTP y autenticación reales, sin ninguna dependencia externa, con arranque instantáneo y estado predecible y descartable entre ejecuciones — y cuando un cambio en el pipeline HTTP del host real se refleja automáticamente en el host Lite por compartir el mismo código, sin tener que tocar nada a mano.
 
-## Alternativas
+## Variantes
+
+La receta anterior es el punto más maduro; el patrón también aparece en dos niveles previos, más simples pero con peor protección frente a divergencia:
+
+- **Extensiones de DI compartidas, sin proyecto `Common` separado.** En vez de extraer un proyecto propio, el host Lite reutiliza directamente las mismas extensiones de registro (`AddXxxApi`, `UseXxxApi`, `AddXxxApiSwaggerGen`) que monta el host real, y solo cambia qué puertos de infraestructura se registran. Es más rápido de montar que separar en proyectos, pero depende de que nadie llame a las extensiones "a medias" en alguno de los dos hosts.
+- **Un solo proyecto con todo junto.** El host Lite es un único proyecto ASP.NET con su propio `Program.cs`, que registra listas en memoria (`List<JournalEntryResponse>` como `Singleton`) detrás de los mismos puertos y sustituye la autenticación real por un handler de autenticación falso. Es el punto de partida más simple y el más rápido de montar, pero no hay ninguna pieza compartida explícita que impida que el host real y el Lite diverjan en el pipeline HTTP con el tiempo.
+
+Alternativas descartadas, fuera de este patrón:
 
 - Mockear HTTP en el frontend (interceptar `fetch`/`axios`): no ejercita el contrato real, se desincroniza en silencio si la API cambia.
 - Backend de mentira con rutas ad-hoc, no generado a partir de los mismos casos de uso: duplica lógica y diverge del comportamiento real con el tiempo.
 - Levantar el backend real con Testcontainers para cada test: correcto y fiel, pero mucho más lento y no aplicable a "que un frontend arranque rápido en local sin Docker".
+
+## Ejemplos
+
+- **[CashClarity](https://github.com/ne2-studio/cashclarity)**: el nivel más simple, un solo proyecto con su propio `Program.cs`, sin capa `Common` separada.
+- **[El Baúl](https://github.com/ne2-studio/el-baul)**: el punto más maduro, con `ElBaul.Api.Common` y `ElBaul.Infra.Lite` como proyectos separados, y el endpoint `POST /lite/testing/seed` para Playwright.
+- **Un repo propietario, sin enlace**: el nivel intermedio, con extensiones de DI compartidas (`AddXxxApi`, `UseXxxApi`) pero sin proyecto `Common` explícito.

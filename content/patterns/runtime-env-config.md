@@ -15,8 +15,6 @@ Un frontend construido con Vite lee sus variables de entorno (`VITE_*`) en tiemp
 
 Eso rompe la promesa de "construyes una vez, despliegas esa misma imagen donde haga falta": la imagen que pasó los tests en staging no es bit a bit la misma que llega a producción, porque cada entorno tiene su propio build.
 
-## Contexto
-
 Aparece en cualquier frontend servido como estático (Vite + nginx, típicamente) que se construye en un pipeline de CI y se despliega como imagen de contenedor a varios entornos. Tiene sentido aplicarlo en cuanto quieres "1 build, many deploys": una única imagen versionada que se promociona de un entorno a otro sin reconstruir, y donde cada entorno solo aporta configuración (URLs, IDs de cliente OIDC, tokens de analítica), nunca código distinto.
 
 No hace falta si cada entorno tiene su propio pipeline de build y nunca promocionas la misma imagen entre entornos — ahí plantar los `VITE_*` en build time es simplemente más simple.
@@ -34,9 +32,7 @@ El flujo:
 
 Esto hace que la misma imagen, sin recompilar nada, sirva staging o producción según qué variables de entorno le pases al `docker run`/manifiesto de despliegue — y sigue funcionando igual (con el valor compilado en build time como fallback) en builds donde no hay un runtime que ejecute el entrypoint, como una app nativa/PWA empaquetada con Capacitor.
 
-## Implementación
-
-En El Baúl (frontends `app` y `admin`, ambos Vite + nginx) esto se monta así:
+Implementación concreta, pieza a pieza:
 
 **`env-config.template.js`** (estático, parte del bundle, nunca se ejecuta tal cual — solo se usa como plantilla):
 
@@ -92,10 +88,14 @@ COPY --from=build /src/dist/ /usr/share/nginx/html/
 COPY --chmod=755 docker-entrypoint.d/95-generate-runtime-env.sh /docker-entrypoint.d/
 ```
 
-El patrón se repite igual en el frontend `admin` del mismo repo, con su propio juego de variables — la mecánica (plantilla + `envsubst` en el entrypoint + `getEnv()` con fallback) es idéntica.
+Se sabe que quedó bien aplicado cuando puedes arrancar el mismo contenedor dos veces con distintas variables de entorno y ver `window.__ENV__` reflejar cada configuración sin haber tocado el build — y cuando el mismo build, sin entrypoint (por ejemplo empaquetado con Capacitor), sigue funcionando gracias al fallback a `import.meta.env`.
 
-## Alternativas
+## Variantes
 
 - **Un build por entorno**: más simple de montar, pero pierdes la garantía de que lo que se probó en staging es exactamente lo que llega a producción, y el pipeline de CI se alarga con un build por entorno.
 - **Montar `env-config.js` como volumen/ConfigMap** en vez de generarlo con `envsubst` en el entrypoint: evita depender de `envsubst`, pero exige que la plataforma de despliegue soporte montar archivos, y añade una pieza de infraestructura más que gestionar por entorno.
 - **Servir la config desde un endpoint HTTP** (`GET /config`) en vez de un archivo estático generado en build: más flexible (permite cambiar config sin reiniciar el contenedor) pero añade una llamada de red bloqueante antes de que la app pueda arrancar, y una pieza de backend extra solo para esto.
+
+## Ejemplos
+
+En [El Baúl](https://github.com/ne2-studio/el-baul), los frontends `app` y `admin` (ambos Vite + nginx) usan esta mecánica tal cual — plantilla + `envsubst` en el entrypoint + `getEnv()` con fallback —, cada uno con su propio juego de variables.

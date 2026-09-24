@@ -11,11 +11,9 @@ maturity: adopt
 
 ## Problema
 
-Tarde o temprano toda API necesita ejecutar una tarea de mantenimiento puntual: un backfill, recalcular una agregación, purgar registros huérfanos, deduplicar datos tras un bug. Esto suele degenerar en uno de dos extremos malos: SQL suelto ejecutado a mano contra producción, que se salta toda la lógica de dominio y las invariantes que la aplicación normalmente garantiza; o un programa aparte con su propio wiring de DI y configuración, que diverge del real con el tiempo (otra cadena de conexión, otras validaciones, otro `appsettings`). Además, si cada comando nuevo requiere registrarse a mano en una lista central, esa lista se olvida y queda desactualizada.
+Tarde o temprano toda API con un composition root no trivial (DI container, configuración por entorno, logging estructurado) necesita ejecutar una tarea de mantenimiento puntual: un backfill, recalcular una agregación, purgar registros huérfanos, deduplicar datos tras un bug. Esto no es solo leer o escribir filas: a menudo hay que invocar los mismos servicios de dominio que la app usa para garantizar sus invariantes (un agregador, un motor de fusión de duplicados, un validador), en vez de reimplementar su lógica en un script.
 
-## Contexto
-
-Aplica a cualquier API con un composition root no trivial (DI container, configuración por entorno, logging estructurado) que necesita ejecutar lógica de negocio real fuera del ciclo request/response — no solo leer o escribir filas, sino invocar los mismos servicios de dominio que la app usa para garantizar sus invariantes. Es especialmente relevante cuando la tarea necesita reutilizar servicios de aplicación ya existentes (un agregador, un motor de fusión de duplicados, un validador) en vez de reimplementar su lógica en un script.
+Esto suele degenerar en uno de dos extremos malos: SQL suelto ejecutado a mano contra producción, que se salta toda la lógica de dominio y las invariantes que la aplicación normalmente garantiza; o un programa aparte con su propio wiring de DI y configuración, que diverge del real con el tiempo (otra cadena de conexión, otras validaciones, otro `appsettings`). Además, si cada comando nuevo requiere registrarse a mano en una lista central, esa lista se olvida y queda desactualizada.
 
 ## Solución
 
@@ -27,7 +25,7 @@ El runner (`dotnet Maintenance.dll <comando> [--dry-run]`) es un ejecutable stan
 
 El comando solo contiene lógica de negocio: recibe sus dependencias por constructor (resueltas del mismo container que la app), y decide qué hacer con el flag `--dry-run`. Todo lo demás — parsing de argumentos comunes, logging estructurado con las líneas canónicas de inicio/fin/duración, captura de excepción como fallo, flush del sink de logs antes de salir — vive una sola vez en el runner.
 
-Ejemplo real (El Baúl, simplificado):
+Receta en código (simplificada):
 
 ```csharp
 // El comando: solo lógica de negocio.
@@ -84,3 +82,7 @@ private static List<(string Name, Type Type)> DiscoverCommands() =>
 Un detalle práctico al montar esto: `WebApplicationBuilder.Build()` en Development valida por defecto que todo el grafo de dependencias registrado sea resoluble — una validación pensada para la app real, que registra su grafo completo. Si el runner registra deliberadamente un grafo más pequeño (solo lo que sus comandos necesitan), esa validación falla en falso. Hay que desactivarla explícitamente (`options.ValidateOnBuild = false`) para igualar el comportamiento que Production ya tiene por defecto.
 
 El resultado: un comando de mantenimiento nuevo es "la app de verdad, ejecutando una ruta de código distinta" — misma config, mismo DI, mismas conexiones, mismas invariantes de dominio — en vez de un script paralelo que hay que mantener sincronizado a mano.
+
+## Ejemplos
+
+- **[El Baúl](https://github.com/ne2-studio/el-baul)**: `AggregateUserActivityCommand`, que recalcula agregados diarios de actividad de usuario reutilizando el mismo `IUserActivityDailyAggregator` que usa la app real.
