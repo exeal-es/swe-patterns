@@ -1,0 +1,14 @@
+{{ $maturityLabels := dict "explore" "Explorando" "trial" "En prueba" "adopt" "Adoptado" }}
+<article class="pattern-card">
+  <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+  {{ with .Params.description }}<p class="description">{{ . }}</p>{{ end }}
+  <div class="meta">
+    {{ with .Params.maturity }}<span class="badge badge-{{ . }}">{{ index $maturityLabels . | default . }}</span>{{ end }}
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_long" }}</time>
+    {{ with .Params.tags }}
+    <span class="tags">
+      {{ range . }}<a class="tag" href="{{ "/tags/" | absURL }}{{ . | urlize }}">#{{ . }}</a>{{ end }}
+    </span>
+    {{ end }}
+  </div>
+</article>

@@ -1,0 +1,21 @@
+baseURL = "https://patterns.exeal.com/"
+locale = "es-ES"
+title = "Patrones — Exeal"
+enableRobotsTXT = true
+
+[params]
+  description = "Biblioteca de patrones de ingeniería de software de Exeal."
+
+[taxonomies]
+  tag = "tags"
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
+  [markup.goldmark.renderer]
+    unsafe = false
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]

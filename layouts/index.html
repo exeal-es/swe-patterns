@@ -1,0 +1,10 @@
+{{ define "main" }}
+<section class="intro">
+  <p>{{ site.Params.description }}</p>
+</section>
+<section class="pattern-list">
+  {{ range (where site.RegularPages "Section" "patterns").ByDate.Reverse }}
+    {{ partial "pattern-card.html" . }}
+  {{ end }}
+</section>
+{{ end }}
