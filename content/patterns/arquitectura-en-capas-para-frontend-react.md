@@ -1,6 +1,6 @@
 ---
 title: "Arquitectura en capas para frontend React"
-description: "Separar una app React en cuatro capas — lógica pura, componentes presentacionales, routes que orquestan, y módulos de API — para que cada pieza se testee con la herramienta más barata posible y un cambio de negocio no obligue a tocar la UI."
+description: "En una SPA React sin fronteras internas, la lógica de negocio, el estado y el JSX se mezclan en el mismo componente, encareciendo los tests y acoplando negocio a UI. La solución separa cuatro capas — API, store, casos de uso y componentes presentacionales — cada una testeable con la herramienta más barata que le sirve."
 date: 2026-09-24
 tags:
   - arquitectura

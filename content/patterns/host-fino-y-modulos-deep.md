@@ -1,6 +1,6 @@
 ---
 title: "Host fino y módulos deep"
-description: "Construir la aplicación como un host casi vacío al que se enchufan módulos con una interfaz narrow y una implementación deep, para que cada módulo se pueda diseñar, testear y validar como una pieza aislada — y para que una IA trabajando sobre un módulo no necesite ver el resto del sistema."
+description: "Sin fronteras reales entre piezas, cualquier clase puede depender de cualquier otra, lo que impide testear en aislamiento y obliga a cargar contexto de todo el sistema para tocar una sola funcionalidad. La solución construye la app como un host casi vacío que enchufa módulos con una interfaz narrow pública y una implementación deep interna al ensamblado."
 date: 2026-09-24
 tags:
   - arquitectura

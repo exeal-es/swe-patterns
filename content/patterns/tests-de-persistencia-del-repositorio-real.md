@@ -1,6 +1,6 @@
 ---
 title: "Tests de persistencia del repositorio real"
-description: "Cuando la lógica de negocio se testea contra repositorios fake en memoria, la implementación real del repositorio (SQL, EF Core) puede quedar sin probar. Un puñado de tests que la ejercitan contra un Postgres real con Testcontainers cierra ese hueco."
+description: "Cuando la lógica de negocio se testea contra un repositorio fake en memoria, la implementación real (SQL, EF Core) puede quedar sin probar — queries que no traducen bien, constraints que el fake no reproduce. La solución es un puñado de tests que ejercitan esa implementación real contra un Postgres real con Testcontainers."
 date: 2026-09-24
 tags:
   - testing

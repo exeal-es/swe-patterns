@@ -1,6 +1,6 @@
 ---
-title: "API Lite"
-description: "Un segundo host de la misma API, con toda la infraestructura sustituida por implementaciones en memoria, para desarrollo de frontend y tests de Playwright deterministas."
+title: "API Lite: un segundo host con infraestructura en memoria"
+description: "Un frontend o una suite de Playwright que depende del backend real arrastra Postgres, colas y proveedores externos, haciendo el desarrollo lento y los tests no deterministas. API Lite es un segundo host de la misma API con toda la infraestructura sustituida por implementaciones en memoria, para desarrollo y tests deterministas."
 date: 2026-09-24
 tags:
   - dotnet

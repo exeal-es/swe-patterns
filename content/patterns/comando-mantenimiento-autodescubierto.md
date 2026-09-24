@@ -1,6 +1,6 @@
 ---
-title: "Comando de mantenimiento auto-descubierto"
-description: "Tareas de mantenimiento (backfills, purgas, recálculos) como comandos individuales descubiertos por reflection, ejecutados sobre el mismo bootstrap de DI/config que la app real, sin levantar HTTP."
+title: "Comandos de mantenimiento en apps .NET"
+description: "Las tareas de mantenimiento puntuales (backfills, purgas, recálculos) suelen acabar como SQL suelto que salta las invariantes de dominio, o como un programa aparte que diverge con el tiempo de la configuración real. La solución son comandos descubiertos por reflection que reutilizan el mismo bootstrap de DI/config que la app real, sin levantar HTTP."
 date: 2026-09-24
 tags:
   - operations

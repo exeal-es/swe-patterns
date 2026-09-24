@@ -1,6 +1,6 @@
 ---
 title: "Arquitectura hexagonal (puertos y adaptadores) en .NET"
-description: "Aislar la lógica de aplicación en un proyecto sin dependencias de infraestructura, exponiendo puertos primarios y secundarios que otros proyectos implementan, para que el core sea unit-testable sin mocks de framework y la frontera arquitectónica la fuerce el compilador, no la disciplina."
+description: "Cuando el dominio llama directamente a la base de datos o al framework web, los casos de uso dejan de ser testeables sin infraestructura real y la frontera arquitectónica se erosiona sin que el compilador lo note. La solución aísla el core en un proyecto sin dependencias de infraestructura, exponiendo puertos primarios y secundarios que implementan proyectos separados."
 date: 2026-09-24
 tags:
   - arquitectura

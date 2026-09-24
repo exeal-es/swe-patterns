@@ -1,6 +1,6 @@
 ---
-title: "Tests de aceptación de frontend sobre la imagen ya construida"
-description: "Playwright contra la imagen Docker del frontend ya empaquetada y el mecanismo api-lite como backend, para verificar el artefacto que se despliega en vez del código fuente."
+title: "Tests de aceptación de frontend sobre una imagen Docker ya construida"
+description: "Una suite de Playwright que arranca contra el código fuente o `vite dev` no ejercita el Dockerfile, nginx ni el entrypoint que inyecta configuración en tiempo de arranque — todo eso puede romperse solo en la imagen empaquetada. La solución corre Playwright contra la imagen Docker del frontend ya construida y el mecanismo api-lite como backend, verificando el artefacto que de verdad se despliega."
 date: 2026-09-24
 tags:
   - frontend

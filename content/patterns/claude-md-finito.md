@@ -1,6 +1,6 @@
 ---
-title: "CLAUDE.md finito"
-description: "Un CLAUDE.md corto es un mapa hacia la documentación, no un lugar donde vive la documentación."
+title: "CLAUDE.md como mapa de contexto para el agente"
+description: "Un CLAUDE.md que vuelca arquitectura, reglas de negocio y contrato de API crece sin límite y se desincroniza, porque nada obliga a actualizarlo en el mismo commit que invalida su contenido. La solución es un CLAUDE.md corto que apunta a la documentación real y dice cuándo leer cada documento, sin explicarla."
 date: 2026-09-24
 tags:
   - agentes

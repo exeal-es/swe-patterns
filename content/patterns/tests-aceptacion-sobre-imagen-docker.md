@@ -1,6 +1,6 @@
 ---
-title: "Tests de aceptación sobre la imagen Docker ya construida"
-description: "Un proyecto de tests separado, sin dependencia de código fuente, que levanta la imagen Docker del backend ya construida junto a sus dependencias reales con Testcontainers y la estimula solo por sus interfaces públicas."
+title: "Tests de aceptación de backend sobre una imagen Docker ya construida"
+description: "Un backend se despliega como imagen Docker, pero los tests contra el código fuente nunca ejercitan el Dockerfile, las variables de entorno del contenedor ni si las migraciones corren al arrancar. La solución es un proyecto de tests separado, sin dependencia de código fuente, que levanta esa imagen ya construida junto a sus dependencias reales con Testcontainers y la estimula solo por sus interfaces públicas."
 date: 2026-09-24
 tags:
   - dotnet

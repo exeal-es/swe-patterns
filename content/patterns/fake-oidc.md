@@ -1,6 +1,6 @@
 ---
-title: "Fake OIDC"
-description: "Un proveedor OIDC de mentira, que habla el subconjunto real del protocolo, para desarrollo local y tests de aceptación deterministas contra una API que exige autenticación real."
+title: "Fake OIDC: proveedor de autenticación de mentira"
+description: "Levantar en local o en tests una API que exige OIDC real obliga a gestionar credenciales de un proveedor externo, o lleva a saltarse la autenticación y dejar de ejercitar el pipeline real. La solución es un proveedor OIDC de mentira que habla el subconjunto real del protocolo, para login determinista tanto en desarrollo como en tests de aceptación."
 date: 2026-09-24
 tags:
   - testing

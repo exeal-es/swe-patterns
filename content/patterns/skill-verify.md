@@ -1,6 +1,6 @@
 ---
-title: "Skill Verify"
-description: "Convertir la verificación de un cambio en una decisión basada en riesgo, no en una sensación de \"parece correcto\"."
+title: "Skill Verify: verificación basada en riesgo"
+description: "Un agente que da una tarea por terminada en cuanto el diff \"tiene buena pinta\" puede dejar pasar bugs reales o, al contrario, sobre-verificar corriendo infraestructura innecesaria. La solución convierte la verificación en una decisión basada en una matriz de riesgo, con un script de comandos deterministas y una skill que elige la evidencia mínima necesaria."
 date: 2026-09-24
 tags:
   - agentes

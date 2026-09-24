@@ -1,6 +1,6 @@
 ---
-title: "DSM Snapshot"
-description: "Versionar la matriz de dependencias entre módulos como snapshot aprobado, para que cualquier acoplamiento nuevo o en dirección prohibida falle el build hasta que alguien lo revise conscientemente."
+title: "DSM Snapshot: matriz de dependencias entre módulos versionada"
+description: "En una arquitectura modular sin fronteras forzadas por el compilador, un import de conveniencia puede cruzar una frontera prohibida o crear un ciclo sin que nadie lo note hasta meses después. La solución versiona la matriz de dependencias entre módulos como snapshot aprobado y la compara en cada build, exigiendo revisión consciente ante cualquier cambio."
 date: 2026-09-24
 tags:
   - arquitectura

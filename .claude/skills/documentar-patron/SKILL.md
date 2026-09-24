@@ -23,6 +23,8 @@ Cuando tengas suficiente información:
 
 - Propón un slug/nombre claro si no está definido.
 - Usa el front matter exacto: `title`, `description`, `date` (hoy), `tags`, `maturity`.
+  - **`title`**: conciso, un resumen de la solución (el nombre del patrón en sí), no una descripción del problema.
+  - **`description`**: exactamente dos frases — la primera describe el problema, la segunda la solución.
 - Sigue la estructura del archetype (`archetypes/patterns.md`): Problema, Solución (obligatorias) y opcionalmente Variantes, Ejemplos, Recursos.
   - **Problema** fusiona problema y contexto: qué duele y en qué condiciones aparece, en una sola sección.
   - **Solución** prescribe una única receta: la idea central más una guía de implementación completa y accionable (pasos, decisiones, código/config representativos) para aplicar el patrón en un proyecto concreto. No presentes varias opciones aquí.

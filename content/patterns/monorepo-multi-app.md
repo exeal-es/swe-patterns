@@ -1,6 +1,6 @@
 ---
-title: "Monorepo multi-app"
-description: "Empaquetar todas las apps de un mismo producto (frontend, backend, panel de administración y, opcionalmente, otros componentes como storage, imgproxy o workers) en un único repositorio git, con un pipeline independiente por app gateado por un glob de rutas."
+title: "Monorepo multi-app con pipeline independiente por app"
+description: "Cuando frontend, backend y admin viven en repos separados, cualquier cambio que cruce esa frontera exige coordinar varios PRs y decidir el orden de merge y de deploy entre repos. La solución empaqueta todas las apps del producto en un único repositorio, con un pipeline independiente por app gateado por un glob de rutas."
 date: 2026-09-24
 tags:
   - monorepo

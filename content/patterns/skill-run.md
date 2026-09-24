@@ -1,6 +1,6 @@
 ---
-title: "Skill Run"
-description: "Hacer reproducible para un agente la ejecución local de una aplicación."
+title: "Skill Run: entorno local determinista para un agente"
+description: "Un agente que levanta un proyecto en local redescubre cada vez qué variables necesita, en qué orden arrancar y qué superficie hace falta, y suele levantar de más o de menos. La solución separa un script determinista con modos explícitos de una skill que le dice al agente cuándo usar cada modo."
 date: 2026-09-24
 tags:
   - agentes

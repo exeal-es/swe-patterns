@@ -1,6 +1,6 @@
 ---
-title: "Result tipado"
-description: "Un tipo Result<T>/ApplicationError que representa los fracasos de negocio esperados como valores de retorno, reservando las excepciones para fallos técnicos, con un único punto que mapea cada error a su respuesta HTTP."
+title: "Gestión de errores explícita con un Result tipado"
+description: "Usar excepciones tanto para denegaciones de negocio esperadas como para fallos técnicos de infraestructura mezcla ambos casos en el mismo mecanismo y deja que cada controlador invente su propio mapeo a HTTP. La solución es un tipo Result<T>/ApplicationError que representa los fracasos esperados como valores de retorno, con un único punto que los mapea a su respuesta HTTP."
 date: 2026-09-24
 tags:
   - dotnet

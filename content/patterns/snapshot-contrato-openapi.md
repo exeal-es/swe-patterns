@@ -1,6 +1,6 @@
 ---
 title: "Snapshot de contrato OpenAPI aceptado explícitamente"
-description: "El documento OpenAPI generado del código se versiona como snapshot aprobado; un test lo regenera y lo compara contra ese snapshot, y solo un comando explícito puede actualizarlo."
+description: "Un contrato OpenAPI generado del código nadie lo escribe ni lo revisa a propósito, así que un refactor puede cambiarlo como efecto secundario sin que nadie se entere hasta que se rompe en producción. La solución versiona ese contrato como snapshot aprobado, lo compara en un test automatizado, y solo un comando explícito puede actualizarlo tras revisión."
 date: 2026-09-24
 tags:
   - dotnet

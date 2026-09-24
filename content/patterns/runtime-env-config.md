@@ -1,6 +1,6 @@
 ---
-title: "Runtime Env Config"
-description: "Cómo hacer que una imagen de frontend construida una sola vez sirva para varios entornos, inyectando las variables de entorno en el arranque del contenedor en vez de plancharlas en el build."
+title: "One build, many deploys para imágenes de frontend"
+description: "Un frontend Vite plancha sus variables de entorno en el bundle durante el build, obligando a construir una imagen distinta por cada entorno. La solución inyecta esas variables en el arranque del contenedor con envsubst, para que una sola imagen construida sirva a todos los entornos."
 date: 2026-09-24
 tags:
   - frontend

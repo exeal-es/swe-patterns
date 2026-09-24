@@ -1,6 +1,6 @@
 ---
-title: "CLI de seed de escenarios contra Postgres local"
-description: "Un CLI aparte que borra y vuelve a poblar la base de datos local con un catálogo fijo de escenarios de negocio, para poder probar a mano cada estado del sistema sin tener que reproducirlo pasando por cada integración real."
+title: "CLI de seed de escenarios de prueba contra base de datos local"
+description: "Llegar a mano a un estado de negocio concreto (un pedido rechazado por scoring, una verificación fallida) exige arrastrar el flujo real por integraciones externas lentas o que no se pueden disparar a demanda en local. La solución es un CLI aparte que borra y repuebla Postgres local con un catálogo fijo de escenarios, dejando el sistema en un estado conocido y reproducible."
 date: 2026-09-24
 tags:
   - testing
