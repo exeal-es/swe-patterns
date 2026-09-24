@@ -1,3 +1,4 @@
 public/
 resources/
+symlinks/
 .hugo_build.lock
