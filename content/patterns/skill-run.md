@@ -5,7 +5,7 @@ date: 2026-09-24
 tags:
   - agentes
   - devex
-maturity: trial
+maturity: adopt
 ---
 
 ## Problema
