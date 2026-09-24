@@ -5,7 +5,7 @@ date: 2026-09-24
 tags:
   - arquitectura
   - testing
-maturity: adopt
+maturity: explore
 ---
 
 ## Problema

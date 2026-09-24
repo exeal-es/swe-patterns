@@ -7,7 +7,7 @@ tags:
   - postgres
   - dotnet
   - cli
-maturity: trial
+maturity: explore
 ---
 
 ## Problema
