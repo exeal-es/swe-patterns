@@ -1,40 +1,41 @@
-name: Publicar web
+name: Build and deploy
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+  packages: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: "0.166.0"
           extended: true
-      - name: Build
-        run: hugo --minify
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: public
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Build Hugo site
+        run: hugo --minify
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build image
+        run: docker build -t $IMAGE_NAME:latest .
+
+      - name: Push image
+        run: docker push $IMAGE_NAME:latest
+
+      - name: Trigger Coolify deploy
+        run: |
+          curl -X POST "${{ vars.COOLIFY_WEBHOOK }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}"
