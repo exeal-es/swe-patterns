@@ -1,0 +1,8 @@
+{{/* Cabecera oscura de página. Recibe dict: kicker, title, sub. */}}
+<section class="hero hero-compact">
+  <div class="container">
+    {{ with .kicker }}<p class="kicker">{{ . }}</p>{{ end }}
+    <h1>{{ .title }}</h1>
+    {{ with .sub }}<p class="hero-sub">{{ . }}</p>{{ end }}
+  </div>
+</section>

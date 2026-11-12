@@ -1,0 +1,2 @@
+{{- $labels := dict "explore" "Explorando" "trial" "En prueba" "adopt" "Adoptado" -}}
+{{- return (index $labels . | default .) -}}

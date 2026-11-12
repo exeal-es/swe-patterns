@@ -1,8 +1,12 @@
 {{ define "main" }}
-<h1>Tags</h1>
-<ul class="tag-list">
-  {{ range .Pages.ByTitle }}
-  <li><a class="tag" href="{{ .Permalink }}">#{{ .Title }} <span class="count">({{ len .Pages }})</span></a></li>
-  {{ end }}
-</ul>
+{{ partial "page-hero.html" (dict "kicker" "$ ls tags/" "title" "Tags" "sub" "Explora los patrones por tema.") }}
+<section class="section-light">
+  <div class="container">
+    <ul class="tags tags-dark tags-cloud">
+      {{ range .Pages.ByTitle }}
+      <li><a href="{{ .Permalink }}">#{{ .Title }} <span class="count">{{ len .Pages }}</span></a></li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
 {{ end }}

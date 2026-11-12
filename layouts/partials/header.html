@@ -1,5 +1,12 @@
 <header class="site-header">
-  <div class="container">
-    <a class="site-title" href="{{ "/" | absURL }}">Patrones <span class="dim">/ Exeal</span></a>
+  <div class="container site-header-inner">
+    <a class="brand" href="{{ "/" | absURL }}">
+      <img src="{{ "assets/img/logo-exeal-header.svg" | relURL }}" alt="Exeal" width="120" height="26">
+      <span class="brand-section">/patrones</span>
+    </a>
+    <nav class="site-nav">
+      <a class="nav-link" href="{{ "/tags/" | absURL }}">Tags</a>
+      <a class="nav-button" href="https://www.exeal.com">exeal.com</a>
+    </nav>
   </div>
 </header>

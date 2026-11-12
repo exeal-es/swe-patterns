@@ -1,14 +1,14 @@
-{{ $maturityLabels := dict "explore" "Explorando" "trial" "En prueba" "adopt" "Adoptado" }}
-<article class="pattern-card">
-  <h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
-  {{ with .Params.description }}<p class="description">{{ . }}</p>{{ end }}
-  <div class="meta">
-    {{ with .Params.maturity }}<span class="badge badge-{{ . }}">{{ index $maturityLabels . | default . }}</span>{{ end }}
-    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_long" }}</time>
-    {{ with .Params.tags }}
-    <span class="tags">
-      {{ range . }}<a class="tag" href="{{ "/tags/" | absURL }}{{ . | urlize }}">#{{ . }}</a>{{ end }}
-    </span>
-    {{ end }}
+{{ $m := .Params.maturity | default "explore" }}
+<article class="card card-{{ $m }}">
+  <div class="card-meta">
+    <span class="maturity maturity-{{ $m }}">{{ partial "maturity-label.html" $m }}</span>
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_medium" }}</time>
   </div>
+  <h2 class="card-title"><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
+  {{ with .Params.description }}<p class="card-description">{{ . }}</p>{{ end }}
+  {{ with .Params.tags }}
+  <ul class="tags tags-small">
+    {{ range . }}<li><a href="{{ "/tags/" | absURL }}{{ . | urlize }}/">#{{ . }}</a></li>{{ end }}
+  </ul>
+  {{ end }}
 </article>

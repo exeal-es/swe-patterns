@@ -5,14 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ if not .IsHome }}{{ .Title }} — {{ end }}{{ site.Title }}</title>
   <meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
-  <link rel="stylesheet" href="{{ "css/style.css" | absURL }}">
+  {{ if or .IsPage .IsHome }}<link rel="canonical" href="{{ .Permalink }}">{{ end }}
+  <link rel="preload" href="{{ "assets/font/gopher-medium-webfont.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ "assets/font/avenir-book.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
+  {{ $css := resources.Get "css/style.css" | fingerprint }}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+  <link rel="icon" type="image/png" href="{{ "assets/img/favicon.png" | relURL }}">
+  <link rel="apple-touch-icon" href="{{ "assets/img/apple-touch-icon.png" | relURL }}">
   {{ with .OutputFormats.Get "rss" }}
   <link rel="alternate" type="application/rss+xml" title="{{ site.Title }}" href="{{ .Permalink }}">
   {{ end }}
 </head>
 <body>
   {{ partial "header.html" . }}
-  <main class="container">
+  <main>
     {{ block "main" . }}{{ end }}
   </main>
   {{ partial "footer.html" . }}

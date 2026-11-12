@@ -1,8 +1,12 @@
 {{ define "main" }}
-<h1>{{ .Title }}</h1>
-<section class="pattern-list">
-  {{ range .Pages.ByDate.Reverse }}
-    {{ partial "pattern-card.html" . }}
-  {{ end }}
+{{ partial "page-hero.html" (dict "kicker" "$ ls patterns/" "title" .Title "sub" site.Params.description) }}
+<section class="section-light">
+  <div class="container">
+    <div class="card-grid">
+      {{ range .Pages.ByDate.Reverse }}
+        {{ partial "pattern-card.html" . }}
+      {{ end }}
+    </div>
+  </div>
 </section>
 {{ end }}

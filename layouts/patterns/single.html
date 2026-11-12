@@ -1,21 +1,31 @@
 {{ define "main" }}
-{{ $maturityLabels := dict "explore" "Explorando" "trial" "En prueba" "adopt" "Adoptado" }}
-<article class="pattern">
-  <header class="pattern-header">
+{{ $m := .Params.maturity | default "explore" }}
+<section class="hero hero-pattern">
+  <div class="container container-narrow">
+    <p class="kicker"><a href="{{ "/" | absURL }}">patrones</a> / {{ .File.ContentBaseName }}</p>
     <h1>{{ .Title }}</h1>
-    {{ with .Params.description }}<p class="description">{{ . }}</p>{{ end }}
-    <div class="meta">
-      {{ with .Params.maturity }}<span class="badge badge-{{ . }}">{{ index $maturityLabels . | default . }}</span>{{ end }}
+    {{ with .Params.description }}<p class="hero-sub">{{ . }}</p>{{ end }}
+    <div class="hero-meta">
+      <span class="maturity maturity-{{ $m }}">{{ partial "maturity-label.html" $m }}</span>
       <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date | time.Format ":date_long" }}</time>
-      {{ with .Params.tags }}
-      <span class="tags">
-        {{ range . }}<a class="tag" href="{{ "/tags/" | absURL }}{{ . | urlize }}">#{{ . }}</a>{{ end }}
-      </span>
-      {{ end }}
+      <span>{{ .ReadingTime }} min de lectura</span>
     </div>
-  </header>
-  <div class="content">
-    {{ .Content }}
+    {{ with .Params.tags }}
+    <ul class="tags tags-light tags-small">
+      {{ range . }}<li><a href="{{ "/tags/" | absURL }}{{ . | urlize }}/">#{{ . }}</a></li>{{ end }}
+    </ul>
+    {{ end }}
   </div>
-</article>
+</section>
+<section class="section-light">
+  <div class="container container-narrow">
+    <article class="prose">
+      {{ .Content }}
+    </article>
+    <nav class="pattern-nav">
+      {{ with .PrevInSection }}<a class="pattern-nav-link" href="{{ .Permalink }}"><span>← Anterior</span>{{ .Title }}</a>{{ else }}<span></span>{{ end }}
+      {{ with .NextInSection }}<a class="pattern-nav-link next" href="{{ .Permalink }}"><span>Siguiente →</span>{{ .Title }}</a>{{ end }}
+    </nav>
+  </div>
+</section>
 {{ end }}

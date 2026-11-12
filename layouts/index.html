@@ -1,10 +1,59 @@
 {{ define "main" }}
-<section class="intro">
-  <p>{{ site.Params.description }}</p>
+{{ $patterns := where site.RegularPages "Section" "patterns" }}
+<section class="hero hero-home">
+  <div class="container hero-grid">
+    <div>
+      <p class="kicker">$ ls ~/exeal/patterns</p>
+      <h1>Patrones de ingeniería que <em>usamos de verdad</em></h1>
+      <p class="hero-sub">{{ site.Params.description }} Cada patrón cuenta el problema, la solución y en qué punto de madurez está.</p>
+      <ul class="hero-facts">
+        <li>{{ len $patterns }} patrones</li>
+        <li>{{ len site.Taxonomies.tags }} tags</li>
+      </ul>
+    </div>
+    <div class="terminal" aria-hidden="true">
+      <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="title">just list</span></div>
+      <div class="terminal-body">
+        <p><span class="prompt">$</span> just list --by maturity</p>
+        {{ range slice "adopt" "trial" "explore" }}
+        {{ $n := len (where $patterns "Params.maturity" .) }}
+        <p><span class="t-{{ . }} t-label">{{ . }}</span><span class="t-count">{{ $n }}</span> <span class="muted">{{ strings.Repeat $n "▮" }}</span></p>
+        {{ end }}
+        <p><span class="prompt">$</span> <span class="cursor"></span></p>
+      </div>
+    </div>
+  </div>
 </section>
-<section class="pattern-list">
-  {{ range (where site.RegularPages "Section" "patterns").ByDate.Reverse }}
-    {{ partial "pattern-card.html" . }}
-  {{ end }}
+
+<section class="section-light">
+  <div class="container">
+    <div class="filter" role="group" aria-label="Filtrar por madurez">
+      <span class="filter-label">Madurez:</span>
+      <button type="button" class="chip is-active" data-filter="all">Todos</button>
+      {{ range slice "adopt" "trial" "explore" }}
+      <button type="button" class="chip chip-{{ . }}" data-filter="{{ . }}">{{ partial "maturity-label.html" . }}</button>
+      {{ end }}
+    </div>
+    <div class="card-grid" id="patterns">
+      {{ range $patterns.ByDate.Reverse }}
+        {{ partial "pattern-card.html" . }}
+      {{ end }}
+    </div>
+  </div>
 </section>
+<script>
+  (function () {
+    var chips = document.querySelectorAll('.filter .chip');
+    var cards = document.querySelectorAll('#patterns .card');
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var f = chip.dataset.filter;
+        chips.forEach(function (c) { c.classList.toggle('is-active', c === chip); });
+        cards.forEach(function (card) {
+          card.hidden = f !== 'all' && !card.classList.contains('card-' + f);
+        });
+      });
+    });
+  })();
+</script>
 {{ end }}
