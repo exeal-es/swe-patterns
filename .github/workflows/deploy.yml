@@ -1,19 +1,26 @@
 name: Build and deploy
 
+# Despliega en Cloudflare Pages (proyecto swe-patterns, cuenta Exeal):
+# push a main -> producción (patterns.exeal.com); PR -> preview en <rama>.swe-patterns.pages.dev.
 on:
   push:
     branches: [main]
+  pull_request:
 
 permissions:
   contents: read
-  packages: write
+  deployments: write
+  pull-requests: write
 
-env:
-  IMAGE_NAME: ghcr.io/${{ github.repository }}
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Los PRs desde forks no tienen acceso a los secrets.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
       - uses: actions/checkout@v4
@@ -24,18 +31,21 @@ jobs:
           extended: true
 
       - name: Build Hugo site
-        run: hugo --minify
+        # En previews, URLs relativas para que los enlaces no salten a producción.
+        run: hugo --minify ${{ github.event_name == 'pull_request' && '--baseURL /' || '' }}
 
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=swe-patterns --branch=${{ github.head_ref || github.ref_name }}
 
-      - name: Build image
-        run: docker build -t $IMAGE_NAME:latest .
-
-      - name: Push image
-        run: docker push $IMAGE_NAME:latest
-
-      - name: Trigger Coolify deploy
+      - name: Comment preview URL
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          URL: ${{ steps.deploy.outputs.pages-deployment-alias-url || steps.deploy.outputs.deployment-url }}
         run: |
-          curl -X POST "${{ vars.COOLIFY_WEBHOOK }}" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}"
+          gh pr comment ${{ github.event.pull_request.number }} --edit-last --create-if-none --body "Preview: $URL"
